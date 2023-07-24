@@ -60,6 +60,28 @@ server.get('/api/recetas', async (req,res) =>{
   })
 });
 
+server.get('/api/recetas/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const select = 'select * from recetas where id = ?';
+    const conn = await getConnection();
+    const [result] = await conn.query(select,id);
+    const data = result[0];
+    res.json({
+      nombre : data.nombre,
+      ingredientes :  data.ingredientes,
+      instrucciones : data.instrucciones
+    });
+
+    conn.end();
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Comprueba los datos",
+    });
+  }
+});
+
 server.post('/api/recetas', async (req,res) =>{
   const user = req.params.user;
   const newReceta = req.body;
@@ -74,7 +96,7 @@ server.post('/api/recetas', async (req,res) =>{
   conn.end();
   res.json({
    success: true,
-   id:recetas_id
+   id:result.insertId
 });
   } catch (error){
     res.json({
